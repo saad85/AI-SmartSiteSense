@@ -8,20 +8,14 @@ interface PageProps {
     }>;
 }
 
-const reconstructedUrl = ({ urls } : { urls: string[] }): string  => {
- const decodedComponents =  urls.map((component) => decodeURIComponent(component) )
- return decodedComponents?.join('/')
-}
+const reconstructedUrl = ({ urls } : { urls: string[] }): string  => 
+    urls?.map((component) => decodeURIComponent(component) )?.join('/')
 
 const Page = async ({ params }: PageProps) => {
-    const resolvedParams = await params; // Await the params object
-    console.log('params:', resolvedParams.url);
-
+    const resolvedParams = await params;
     const reConstructedUrl = reconstructedUrl( { urls: resolvedParams.url as string[] } )
-    console.log('reConstructedUrl:', reConstructedUrl);
 
-    const isAlreadyindexed = await redis.sismember("indexed-urls", reConstructedUrl)
-    console.log('isAlreadyindexed ', isAlreadyindexed)
+    const isAlreadyindexed = await redis.sismember("indexed-urls", reConstructedUrl) // Chercks if alr xxists in redis
 
     if(!isAlreadyindexed) {
         const response = await ragChat.context.add({
@@ -29,10 +23,8 @@ const Page = async ({ params }: PageProps) => {
             source: reConstructedUrl,
             config: { chunkOverlap: 50, chunkSize: 200 },
           });
-    
-          console.log('response:', response);
 
-          redis.sadd("indexed-urls", reConstructedUrl)
+          redis.sadd("indexed-urls", reConstructedUrl) // sets in redis
     }
 
     return <ChatWrapper sessionId="mock"/>;
