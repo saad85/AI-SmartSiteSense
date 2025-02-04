@@ -23,11 +23,15 @@ const Page = async ({ params }: PageProps) => {
   ); // Chercks if alr xxists in redis
 
   if (!isAlreadyindexed) {
-    await ragChat.context.add({
-      type: "html",
-      source: reConstructedUrl,
-      config: { chunkOverlap: 50, chunkSize: 200 },
-    });
+    try {
+      const response = await ragChat.context.add({
+        type: "html",
+        source: reConstructedUrl,
+        config: { chunkOverlap: 25, chunkSize: 2000 },
+      });
+    } catch (err) {
+      console.log("err ", err);
+    }
 
     redis.sadd("indexed-urls", reConstructedUrl); // sets in redis
   }
