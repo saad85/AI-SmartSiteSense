@@ -24,7 +24,7 @@ const Page = async ({ params }: PageProps) => {
 
   if (!isAlreadyindexed) {
     try {
-      const response = await ragChat.context.add({
+      await ragChat.context.add({
         type: "html",
         source: reConstructedUrl,
         config: { chunkOverlap: 25, chunkSize: 2000 },
